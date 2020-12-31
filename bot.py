@@ -93,7 +93,7 @@ def about(update, ctx):
         ctx.bot.send_message(chat_id=update.message.chat_id,
                              text="""
 Hello there,
-I am the official Beyondcoin Telegram Tipbot, created by [salmaan1234](tg://user?id=905257225)\\. Run /help to see my full list of commands\\.
+I am the official Beyondcoin Telegram Tipbot, created by [Beyondtoshi](tg://user?id=875585344) and [salmaan1234](tg://user?id=905257225)\\. Run /help to see my full list of commands\\.
 This bot is fully [Open Source](https://github\\.com/beyondcoin\\-project/BeyondcoinTGBot)\\.
                              """, parse_mode="MarkdownV2")
 
@@ -274,7 +274,7 @@ def balance(update, ctx):
         else:
             balance = getBalance(user["id"])
 
-            ctx.bot.send_message(chat_id=update.message.chat_id, text=f"You current balance: {balance} {config.coin['ticker']}")
+            ctx.bot.send_message(chat_id=update.message.chat_id, text=f"Your current balance: {balance} {config.coin['ticker']}")
 
 
 def export(update, ctx):
