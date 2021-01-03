@@ -305,11 +305,13 @@ def price(update, ctx):
         usd = str(format(history["beyondcoin"]["usd"], '.4f'))
         daily = str(format(history["beyondcoin"]["usd_24h_change"], '.2f'))
         volume = str(format(history["beyondcoin"]["usd_24h_vol"], '.2f'))
+        mktcap = str(format(history["beyondcoin"]["usd_market_cap"], '.2f'))
 
         ctx.bot.send_message(chat_id=update.message.chat_id, text=f"""
 Current price: <code>{usd}</code> USD
 24 hour change: <code>{daily}</code>%
 24 hour volume: <code>{volume}</code> USD
+Market cap: <code>{mktcap}</code> USD
 """, parse_mode="HTML")
 
 ### FUNCTIONS
