@@ -53,7 +53,8 @@ Hey there [{escape_markdown(user['first_name'], 2)}](tg://user?id={user['id']})\
 5\\. /balance
 6\\. /withdraw address amount
 7\\. /export \\(only works in direct messages\\)
-8\\. /about
+8\\. /price
+9\\. /about
                 """, parse_mode="MarkdownV2")
                 ctx.bot.send_message(chat_id=update.message.chat_id,
                                      text="*Please Note: * It is highly recommended that you do not directly mine to the "
@@ -73,7 +74,8 @@ Hey there [{escape_markdown(user['first_name'], 2)}](tg://user?id={user['id']})\
 5\\. /balance
 6\\. /withdraw address amount
 7\\. /export \\(only works in direct messages\\)
-8\\. /about
+8.\\. /price
+9\\. /about
                 """, parse_mode="MarkdownV2")
                 ctx.bot.send_message(chat_id=update.message.chat_id,
                                      text="*Please Note: * It is highly recommended that you do not directly mine to the "
@@ -285,10 +287,30 @@ def export(update, ctx):
     if timestart < int(timestamp):
         user = update.message.from_user
         if update.message.chat.type == "private":
-            ctx.bot.send_message(chat_id=update.message.chat_id, text=f"You're exported secret key: <code>{db.getWIF(user['id'])}</code>. <b>Important:</b> Do not share this key. If you do share this key, all your BYND will be lost.", parse_mode="HTML")
+            ctx.bot.send_message(chat_id=update.message.chat_id, text=f"Your exported secret key: <code>{db.getWIF(user['id'])}</code>. <b>Important:</b> Do not share this key. If you do share this key, all your BYND will be lost.", parse_mode="HTML")
         else:
             ctx.bot.send_message(chat_id=update.message.chat_id, text="This command only works in private messages."
                                                                       " Send me a private message instead :D")
+
+def price(update, ctx):
+    gettime = str(update.message.date).split()
+    timetoconvert = gettime[0] + "T" + gettime[1]
+    timestamp = strict_rfc3339.rfc3339_to_timestamp(timetoconvert)
+
+    if timestart < int(timestamp):
+
+        history = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={config.coin['coin_name']}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true").json()
+        info = requests.get(f"{config.apiUrl}/info").json()
+
+        usd = str(format(history["beyondcoin"]["usd"], '.4f'))
+        daily = str(format(history["beyondcoin"]["usd_24h_change"], '.2f'))
+        volume = str(format(history["beyondcoin"]["usd_24h_vol"], '.2f'))
+
+        ctx.bot.send_message(chat_id=update.message.chat_id, text=f"""
+Current price: <code>{usd}</code> USD
+24 hour change: <code>{daily}</code>%
+24 hour volume: <code>{volume}</code> USD
+""", parse_mode="HTML")
 
 ### FUNCTIONS
 
@@ -523,6 +545,7 @@ def main():
     withdraw_command = CommandHandler('withdraw', withdraw)
     about_command = CommandHandler('about', about)
     export_command = CommandHandler('export', export)
+    getprice_command = CommandHandler('price', price)
 
     tip_or_withdraw_handler = CallbackQueryHandler(tip_or_withdrawFunc)
     dispatcher.add_handler(help_command)
@@ -533,6 +556,7 @@ def main():
     dispatcher.add_handler(withdraw_command)
     dispatcher.add_handler(about_command)
     dispatcher.add_handler(export_command)
+    dispatcher.add_handler(getprice_command)
 
     dispatcher.add_handler(tip_or_withdraw_handler)
 
