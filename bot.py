@@ -299,19 +299,59 @@ def price(update, ctx):
 
     if timestart < int(timestamp):
 
-        history = requests.get(f"https://api.coingecko.com/api/v3/simple/price?ids={config.coin['coin_name']}&vs_currencies=usd&include_market_cap=true&include_24hr_vol=true&include_24hr_change=true").json()
-        info = requests.get(f"{config.apiUrl}/info").json()
+        history = requests.get(f"https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids={config.coin['coin_name']}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=1h%2C24h%2C7d%2C14d%2C30d").json()
 
-        usd = str(format(history["beyondcoin"]["usd"], '.4f'))
-        daily = str(format(history["beyondcoin"]["usd_24h_change"], '.2f'))
-        volume = str(format(history["beyondcoin"]["usd_24h_vol"], '.2f'))
-        mktcap = str(format(history["beyondcoin"]["usd_market_cap"], '.2f'))
+        usd = str(format(history[0]["current_price"], '.5f'))
+        hourly = None
+        daily = None
+        weekly = None
+        monthly = None
+        volume = None
+
+        try:
+            hourly = str(format(history[0]["price_change_percentage_1h_in_currency"], '.2f'))
+        except TypeError:
+            hourly = "0"
+
+        try:
+            daily = str(format(history[0]["price_change_percentage_24h_in_currency"], '.2f'))
+        except TypeError:
+            daily = "0"
+
+        try:
+            weekly = str(format(history[0]["price_change_percentage_7d_in_currency"], '.2f'))
+        except TypeError:
+            weekly = "0"
+
+        try:
+            monthly = str(format(history[0]["price_change_percentage_30d_in_currency"], '.2f'))
+        except TypeError as e:
+            monthly = "0"
+
+        try:
+            volume = str(format(history[0]["total_volume"], '.2f'))
+        except TypeError:
+            volume = "0"
+
+        try:
+            high = str(format(history[0]["high_24h"], '.5f'))
+        except TypeError:
+            high = "0"
+
+        try:
+            low = str(format(history[0]["low_24h"], '.5f'))
+        except TypeError:
+            low = "0"
 
         ctx.bot.send_message(chat_id=update.message.chat_id, text=f"""
 Current price: <code>{usd}</code> USD
+24 hour high: <code>{high}</code> USD
+24 hour low: <code>{low}</code> USD
+1 hour change: <code>{hourly}</code>%
 24 hour change: <code>{daily}</code>%
+1 week change: <code>{weekly}</code>%
+1 month change: <code>{monthly}</code>%
 24 hour volume: <code>{volume}</code> USD
-Market cap: <code>{mktcap}</code> USD
 """, parse_mode="HTML")
 
 ### FUNCTIONS
@@ -569,5 +609,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-

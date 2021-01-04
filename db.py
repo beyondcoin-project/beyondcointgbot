@@ -55,4 +55,3 @@ def getWIF(id: str):
     cursor.execute(f"SELECT wif FROM userlist WHERE userid='{id}'")
 
     return list(cursor.fetchall()[0])[0]
-
